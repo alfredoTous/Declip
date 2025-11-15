@@ -42,14 +42,14 @@ def menu_select(mode):
         return None
 
 # Aux rofi menu for prompting when more data is needed for the decode/encode
-def input_prompt(mode, msj):
+def input_prompt(mode, msg):
 
     rofi_cmd = [
         "rofi",
         "-no-config",
         "-dmenu",
         "-p", mode,
-        "-mesg", msj,
+        "-mesg", msg,
         "-lines", "0",
         "-width", "26",
         "-theme-str", ROFI_INPUT_PROMPT_THEME
