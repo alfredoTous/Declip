@@ -43,8 +43,7 @@ def decode_data(data, opt):
         return decoded_data # type: ignore 
 
     except Exception as e:
-        ui_notification.print_error(f"Error at decoding: {e}", args)
-        sys.exit(1)
+        exit_with_error(f'Error at decoding: {e}')
 
 
 # Encode given the data and mode
@@ -67,8 +66,7 @@ def encode_data(data, opt):
         return encoded_data #type: ignore
 
     except Exception as e:
-        ui_notification.print_error(f"Error at encoding: {e}", args)
-        sys.exit(1)
+        exit_with_error(f'Error at encoding: {e}')
 
 
 # Parse arguments
@@ -93,6 +91,12 @@ def check_rofi():
     pass
 
 
+def exit_with_error(msg):
+    if not args.quiet:
+        ui_notification.print_error(msg)
+    sys.exit(1)
+
+
 def main():
     # Set arguments to global scope, not the best practice but we can take the risk on a small tool like this ;)
     global args
@@ -102,17 +106,14 @@ def main():
     data = pyperclip.paste()
 
     # Validate clipboard and arguments 
-    if not data or len(data) == 0: 
-        ui_notification.print_error('clipboard empty', args) 
-        sys.exit(1) 
+    if not data or len(data) == 0:
+        exit_with_error('clipboard empty')
 
     if not args.decode and not args.encode:
-        ui_notification.print_error('Invalid Arguments: script needs --decode OR --encode argument', args)
-        sys.exit(1)
-
+        exit_with_error('Invalid Arguments: script needs --decode OR --encode argument')
+ 
     if args.decode and args.encode:
-        ui_notification.print_error('Invalid Arguments: use only one mode --decode OR --encode', args)
-        sys.exit(1)
+        exit_with_error('Invalid Arguments: use only one mode --decode OR --encode')
 
     result_data = None
     mode = None
@@ -121,8 +122,7 @@ def main():
     if args.decode:
         opt = ui_rofi.menu_select('Decode')
         if opt == None:
-            ui_notification.print_error('Option not valid', args)
-            sys.exit(1)
+            exit_with_error('Option not valid')
         result_data = decode_data(data, opt)
         mode = 'Decode'
 
@@ -130,19 +130,18 @@ def main():
     if args.encode:
         opt = ui_rofi.menu_select('Encode')
         if opt == None:
-            ui_notification.print_error('Option not valid', args)
-            sys.exit(1)
+            exit_with_error('Option not valid')
         result_data = encode_data(data, opt)
         mode = 'Encode'
 
     if result_data == None:
-        ui_notification.print_error("Unexpected Error", args)
-        sys.exit(1)
+        exit_with_error('Unexpected Error')
 
     if not args.no_clip:
         pyperclip.copy(str(result_data)) 
     
-    ui_notification.show_data(result_data, mode, args)
+    if not args.quiet:
+        ui_notification.show_data(result_data, mode)
    
     return result_data
 
