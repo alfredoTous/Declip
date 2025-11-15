@@ -9,6 +9,7 @@ from urllib.parse import unquote, quote
 
 import ui_rofi
 import ui_notification
+import codec
 
 """
    TO-DO 
@@ -17,6 +18,7 @@ import ui_notification
     6. README.md 
     7. Add xor, rot, hash-id
     8. Add logs
+    9. --quiet only errors or only data
 """
 
 # Ctrl+C
@@ -39,6 +41,12 @@ def decode_data(data, opt):
             decoded_data = bytes.fromhex(data).decode('utf-8')
         elif opt == 'base32':
             decoded_data = base64.b32decode(data).decode()
+        elif opt == 'rot':
+            decoded_data = codec.rot_decode()(data)
+        elif opt == 'xor':
+            pass
+        elif opt == 'hash-id':
+            pass
 
         return decoded_data # type: ignore 
 
@@ -62,6 +70,12 @@ def encode_data(data, opt):
             data_bytes = data.encode('utf-8')
             encoded_data_bytes = base64.b32encode(data_bytes)
             encoded_data = encoded_data_bytes.decode('utf-8')
+        elif opt == 'rot':
+            encoded_data =  codec.rot_encode()(data)
+        elif opt == 'xor':
+            pass 
+        elif opt == 'hash-id':
+            pass
         
         return encoded_data #type: ignore
 
