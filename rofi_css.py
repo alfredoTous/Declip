@@ -1,5 +1,5 @@
 
-ROFI_THEME = r"""
+ROFI_THEME = """
         * {
             background: rgba(10, 10, 10, 0.90);
             border: 0;
@@ -67,4 +67,56 @@ ROFI_THEME = r"""
         element-text selected {
             text-color: #88c0d0;
         }
+"""
+
+ROFI_INPUT_PROMPT_THEME = """
+        * {
+            background: rgba(10,10,10,0.94);
+            font: "JetBrainsMono Nerd Font 13";
+            text-color: #e5e9f0;
+        }
+
+        window {
+            location: center;
+            width: 19em;
+            border: 2px;
+            border-color: #88c0d0;
+            border-radius: 6px;
+            padding: 0;
+        }
+
+        mainbox {
+            children: [inputbar, message];
+            spacing: 2px;
+            margin: 0;
+            padding: 2px 0;
+        }
+
+        inputbar {
+            children: [prompt, entry];
+            spacing: 2px;
+            margin: 0;
+            padding: 2px 4px;
+        }
+
+        prompt {
+            text-color: #88c0d0;
+            font: "JetBrainsMono Nerd Font Bold 13";
+            padding: 0 4px 0 0;
+        }
+
+        entry {
+            expand: true;
+            text-color: #9ece6a;
+            background-color: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            padding: 1px 6px;
+        }
+
+        message {
+            font: "JetBrainsMono Nerd Font 10";
+            padding: 0 6px 2px 6px;
+            margin: 0;
+        }
+
 """

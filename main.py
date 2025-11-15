@@ -6,8 +6,8 @@ import signal
 import argparse
 import subprocess
 import base64
-from urllib.parse import unquote, urlencode
-from rofi_css import ROFI_THEME
+from urllib.parse import unquote, quote
+from rofi_css import ROFI_THEME, ROFI_INPUT_PROMPT_THEME
 
 """
    TO-DO 
@@ -66,6 +66,31 @@ def rofi_menu_select(mode):
         return None
 
 
+
+# Aux rofi menu for prompting when more data is needed for the decode/encode
+def rofi_input_prompt(mode, msj):
+
+    rofi_cmd = [
+        "rofi",
+        "-no-config",
+        "-dmenu",
+        "-p", mode,
+        "-mesg", msj,
+        "-lines", "0",
+        "-width", "26",
+        "-theme-str", ROFI_INPUT_PROMPT_THEME
+    ]
+
+    result = subprocess.run(
+        rofi_cmd,
+        text=True,
+        capture_output=True
+    )
+
+    return result.stdout.strip()
+
+
+
 # Decode given the data and mode
 def decode_data(data, opt):
 
@@ -94,7 +119,7 @@ def encode_data(data, opt):
             encoded_data_bytes = base64.b64encode(data_bytes)
             encoded_data = encoded_data_bytes.decode('utf-8')
         elif opt == 'url':
-            encoded_data = urlencode(data)
+            encoded_data = quote(data)
         elif opt == 'hex':
             encoded_data = data.encode("utf-8").hex()
         elif opt == 'base32':
