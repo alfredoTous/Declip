@@ -4,11 +4,11 @@ import pyperclip
 import sys
 import signal
 import argparse
-import subprocess
 import base64
 from urllib.parse import unquote, quote
 
 import ui_rofi
+import ui_notification
 
 """
    TO-DO 
@@ -26,6 +26,7 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
+
 # Decode given the data and mode
 def decode_data(data, opt):
 
@@ -42,8 +43,9 @@ def decode_data(data, opt):
         return decoded_data # type: ignore 
 
     except Exception as e:
-        print_error_notification(f"Error at decoding: {e}")
+        ui_notification.print_error(f"Error at decoding: {e}", args)
         sys.exit(1)
+
 
 # Encode given the data and mode
 def encode_data(data, opt):
@@ -65,36 +67,8 @@ def encode_data(data, opt):
         return encoded_data #type: ignore
 
     except Exception as e:
-        print_error_notification(f"Error at encoding: {e}")
+        ui_notification.print_error(f"Error at encoding: {e}", args)
         sys.exit(1)
-
-
-# Show desktop notification (handled by dunst in my setup) on urgency mode 'critical' for errors
-def print_error_notification(error_msj):
-    
-    if args.quiet:
-        return
-
-    subprocess.run([
-        "notify-send",
-        "-u", "critical",
-        "-t", "6000",
-        "⚠️ Error",
-        error_msj.strip()
-    ])
-
-# Show desktop notification (handled by dunst in my setup) for correctly decoded/encoded data
-def show_data_notification(data, mode):
-
-    if args.quiet:
-        return
-
-    subprocess.run([
-        "notify-send",
-        "-t", "5000",
-        f"🧩 {mode}",
-        str(data).strip()
-    ])
 
 
 # Parse arguments
@@ -118,6 +92,7 @@ def check_rofi():
     # Checks if rofi is available
     pass
 
+
 def main():
     # Set arguments to global scope, not the best practice but we can take the risk on a small tool like this ;)
     global args
@@ -128,15 +103,15 @@ def main():
 
     # Validate clipboard and arguments 
     if not data or len(data) == 0: 
-        print_error_notification('clipboard empty') 
+        ui_notification.print_error('clipboard empty', args) 
         sys.exit(1) 
 
     if not args.decode and not args.encode:
-        print_error_notification('Invalid Arguments: script needs --decode OR --encode argument')
+        ui_notification.print_error('Invalid Arguments: script needs --decode OR --encode argument', args)
         sys.exit(1)
 
     if args.decode and args.encode:
-        print_error_notification('Invalid Arguments: use only one mode --decode OR --encode')
+        ui_notification.print_error('Invalid Arguments: use only one mode --decode OR --encode', args)
         sys.exit(1)
 
     result_data = None
@@ -146,7 +121,7 @@ def main():
     if args.decode:
         opt = ui_rofi.menu_select('Decode')
         if opt == None:
-            print_error_notification('Option not valid')
+            ui_notification.print_error('Option not valid', args)
             sys.exit(1)
         result_data = decode_data(data, opt)
         mode = 'Decode'
@@ -155,21 +130,22 @@ def main():
     if args.encode:
         opt = ui_rofi.menu_select('Encode')
         if opt == None:
-            print_error_notification('Option not valid')
+            ui_notification.print_error('Option not valid', args)
             sys.exit(1)
         result_data = encode_data(data, opt)
         mode = 'Encode'
 
     if result_data == None:
-        print_error_notification("Unexpected Error")
+        ui_notification.print_error("Unexpected Error", args)
         sys.exit(1)
 
     if not args.no_clip:
         pyperclip.copy(str(result_data)) 
     
-    show_data_notification(result_data, mode)
+    ui_notification.show_data(result_data, mode, args)
    
     return result_data
+
 
 if __name__ == '__main__':
     print(main())
