@@ -3,7 +3,7 @@ import subprocess
 
 # Rofi menu for selecting decode/encode mode
 def menu_select(mode):
-    options = "1. Base64\n2. URL\n3. Hex\n4. Base32"
+    options = "1. Base64\n2. URL\n3. Hex\n4. Base32\n5. Rot\n6. Xor\n7. Hash-id"
     
     # Define command
     rofi_cmd = [
@@ -12,7 +12,7 @@ def menu_select(mode):
         "-dmenu",
         "-p", mode,
         "-font", "JetBrainsMono Nerd Font 13",
-        "-lines", "4",
+        "-lines", "7",
         "-width", "18",
         "-no-fixed-num-lines",
         "-i",
@@ -38,6 +38,12 @@ def menu_select(mode):
         return 'hex'
     elif opt.startswith("4"):
         return 'base32'
+    elif opt.startswith("5"):
+        return 'rot'
+    elif opt.startswith("6"):
+        return 'xor'
+    elif opt.startswith("7"):
+        return 'hash-id' 
     else:
         return None
 
