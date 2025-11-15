@@ -4,7 +4,7 @@ ROFI_THEME = """
             background: rgba(10, 10, 10, 0.90);
             border: 0;
             border-radius: 10px;
-            font: "JetBrainsMono Nerd Font 11";
+            font: "JetBrainsMono Nerd Font 12";
             text-color: #eaeaea;
             spacing: 4px;
         }
@@ -14,6 +14,9 @@ ROFI_THEME = """
             padding: 8px;
             transparency: "real";
             location: center;
+            border: 2px;
+            border-color: #88c0d0;
+            border-radius: 8px;
         }
 
         inputbar {
@@ -24,7 +27,7 @@ ROFI_THEME = """
         }
 
         prompt {
-            text-color: #a3be8c;
+            text-color: #9ece6a;
             font: "JetBrainsMono Nerd Font Bold 12";
             padding: 2px 4px;
         }
@@ -32,20 +35,20 @@ ROFI_THEME = """
         entry {
             expand: true;
             text-color: #ffffff;
-            background-color: rgba(255,255,255,0.08);
+            background-color: rgba(255,255,255,0.12);
             border-radius: 6px;
             padding: 4px 6px;
         }
 
         listview {
             scrollbar: false;
-            spacing: 3px;
-            lines: 4;
+            spacing: 4px;
+            lines: 7;
             background-color: rgba(10,10,10,0.90);
         }
 
         element {
-            padding: 3px 8px;
+            padding: 4px 9px;
             border-radius: 6px;
             background-color: rgba(25,25,25,0.85); 
         }
@@ -71,7 +74,7 @@ ROFI_THEME = """
 
 ROFI_INPUT_PROMPT_THEME = """
         * {
-            background: rgba(10,10,10,0.94);
+            background: rgba(10,10,10,0.92);
             font: "JetBrainsMono Nerd Font 13";
             text-color: #e5e9f0;
         }
@@ -81,7 +84,7 @@ ROFI_INPUT_PROMPT_THEME = """
             width: 19em;
             border: 2px;
             border-color: #88c0d0;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 0;
         }
 
@@ -100,23 +103,24 @@ ROFI_INPUT_PROMPT_THEME = """
         }
 
         prompt {
-            text-color: #88c0d0;
+            text-color: #9ece6a;
             font: "JetBrainsMono Nerd Font Bold 13";
             padding: 0 4px 0 0;
         }
 
         entry {
             expand: true;
-            text-color: #9ece6a;
-            background-color: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            padding: 1px 6px;
+            text-color: #ffffff;
+            background-color: rgba(255,255,255,0.12);
+            border-radius: 5px;
+            padding: 2px 6px;
         }
 
         message {
             font: "JetBrainsMono Nerd Font 10";
+            text-color: #88c0d0;
             padding: 0 6px 2px 6px;
             margin: 0;
         }
-
 """
+
