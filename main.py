@@ -2,6 +2,7 @@
 
 import pyperclip
 import sys
+import os
 import signal
 import argparse
 import base64
@@ -17,7 +18,7 @@ import codec
     4. Verify behavior on different cases 
     6. README.md 
     7. Add xor, rot, hash-id
-    8. Add logs
+    8. Add logs and -o for output log, default ./declip.log
     9. --quiet only errors or only data
 """
 
@@ -44,9 +45,9 @@ def decode_data(data, opt):
         elif opt == 'rot':
             decoded_data = codec.rot_decode()(data)
         elif opt == 'xor':
-            pass
+            decoded_data = codec.xor_decrypt(data)
         elif opt == 'hash-id':
-            pass
+            decoded_data = codec.hash_id(data, 'decode')
 
         return decoded_data # type: ignore 
 
@@ -73,9 +74,9 @@ def encode_data(data, opt):
         elif opt == 'rot':
             encoded_data =  codec.rot_encode()(data)
         elif opt == 'xor':
-            pass 
+            encoded_data = codec.xor_encrypt(data) 
         elif opt == 'hash-id':
-            pass
+            encoded_data = codec.hash_id(data, 'encode')
         
         return encoded_data #type: ignore
 
@@ -112,6 +113,8 @@ def exit_with_error(msg):
 
 
 def main():
+    # Ensure user local/bin is in Path for hashid when script is executed via sxhkd
+    os.environ["PATH"] += os.pathsep + os.path.expanduser("~/.local/bin")
     # Set arguments to global scope, not the best practice but we can take the risk on a small tool like this ;)
     global args
     args = parse_args()
