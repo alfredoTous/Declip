@@ -6,6 +6,7 @@ import os
 import signal
 import argparse
 import base64
+import shutil
 from urllib.parse import unquote, quote
 
 import ui_rofi
@@ -14,10 +15,9 @@ import codec
 
 """
    TO-DO 
-    3. Check if Rofi is available
     4. Verify behavior on different cases 
     6. README.md 
-    7. Add xor, rot, hash-id
+    7. Improve xor
     8. Add logs and -o for output log, default ./declip.log
     9. --quiet only errors or only data
 """
@@ -100,10 +100,9 @@ def parse_args():
 
     return parser.parse_args()
 
-
+# Checks if rofi is available
 def check_rofi():
-    # Checks if rofi is available
-    pass
+    return shutil.which('rofi')
 
 
 def exit_with_error(msg):
@@ -121,6 +120,9 @@ def main():
 
     # Get data from clipboard
     data = pyperclip.paste()
+
+    if not check_rofi():
+        exit_with_error('Rofi was not found')
 
     # Validate clipboard and arguments 
     if not data or len(data) == 0:
