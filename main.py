@@ -19,7 +19,6 @@ import codec
     6. README.md 
     7. Improve xor
     8. Add logs and -o for output log, default ./declip.log
-    9. --quiet only errors or only data
 """
 
 # Ctrl+C
@@ -94,7 +93,13 @@ def parse_args():
 
     parser.add_argument("--no-clip", action="store_true", help="Don't copy result to clipboard")
 
-    parser.add_argument("--quiet", action="store_true", help="Don't show notifications")
+    parser.add_argument(
+        "--quiet", 
+        nargs="?",
+        const="all", # Default value
+        choices=["error", "data", "all"],
+        help="Silence notifications, 'error' to hide errors, 'data' to hide decoded/encoded data, 'all' to hide both (default)"
+    )
 
     parser.add_argument("-v", action="store_true", help="Activate logs on script dir")
 
@@ -106,7 +111,7 @@ def check_rofi():
 
 
 def exit_with_error(msg):
-    if not args.quiet:
+    if args.quiet not in ('error', 'all'):
         ui_notification.print_error(msg)
     sys.exit(1)
 
@@ -159,7 +164,7 @@ def main():
     if not args.no_clip:
         pyperclip.copy(str(result_data)) 
     
-    if not args.quiet:
+    if args.quiet not in ('data', 'all'):
         ui_notification.show_data(result_data, mode)
    
     return result_data
