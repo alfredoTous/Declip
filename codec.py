@@ -16,26 +16,28 @@ def rot_get_n(mode):
     except Exception as e:
         raise Exception(f'Expected a valid integer: {e}')
 
-def rot_encode(n=None):
+def rot_encode(data=None, n=None):
     if not n:
         n = rot_get_n('Encode')
 
     from string import ascii_lowercase as lc, ascii_uppercase as uc
     lookup = str.maketrans(lc + uc, lc[n:] + lc[:n] + uc[n:] + uc[:n])
-    return lambda s: s.translate(lookup)
+    result = None if data is None else data.translate(lookup)
+    return result, n
 
-def rot_decode():
+def rot_decode(data=None):
     n = rot_get_n('Decode')
-    return rot_encode(-n)
+    result, _ = rot_encode(data, -n)
+    return result, n
 
 
 def xor_decrypt(data):
     key = ui_rofi.input_prompt('Decrypt', 'Enter Key')
-    return ''.join(chr(ord(c1) ^ ord(c2)) for (c1, c2) in zip(data, key * (len(data) // len(key) + 1)))
+    return ''.join(chr(ord(c1) ^ ord(c2)) for (c1, c2) in zip(data, key * (len(data) // len(key) + 1))), key
 
 def xor_encrypt(data):
     key = ui_rofi.input_prompt('Encrypt', 'Enter Key')
-    return ''.join(chr(ord(c) ^ ord(k)) for c, k in zip(data, cycle(key)))
+    return ''.join(chr(ord(c) ^ ord(k)) for c, k in zip(data, cycle(key))), key
 
 # Checks which hash Identification tool is available
 def check_hash_tools():
@@ -71,6 +73,6 @@ def hash_id(data, mode):
     if result.returncode != 0:
         raise Exception(f'{tool} failed: {result.stderr.strip()}')
     
-    return result.stdout.strip()
+    return result.stdout.strip(), tool
 
 

@@ -37,11 +37,14 @@ def decode_data(data, opt):
         elif opt == 'base32':
             decoded_data = base64.b32decode(data).decode()
         elif opt == 'rot':
-            decoded_data = codec.rot_decode()(data)
+            decoded_data, n = codec.rot_decode(data)
+            add_log_info(f'Using n: {n} for ROT')
         elif opt == 'xor':
-            decoded_data = codec.xor_decrypt(data)
+            decoded_data, key = codec.xor_decrypt(data)
+            add_log_info(f'Using key: {key} for XOR Decryption')
         elif opt == 'hash-id':
-            decoded_data = codec.hash_id(data, 'decode')
+            decoded_data, tool = codec.hash_id(data, 'decode')
+            add_log_info(f'Using tool: {tool} for hash identification')
 
         return decoded_data
 
@@ -66,11 +69,14 @@ def encode_data(data, opt):
             encoded_data_bytes = base64.b32encode(data_bytes)
             encoded_data = encoded_data_bytes.decode('utf-8')
         elif opt == 'rot':
-            encoded_data =  codec.rot_encode()(data)
+            encoded_data, n =  codec.rot_encode(data)
+            add_log_info(f'Using n: {n} for ROT')
         elif opt == 'xor':
-            encoded_data = codec.xor_encrypt(data) 
+            encoded_data, key = codec.xor_encrypt(data)
+            add_log_info(f'Using key: {key} for XOR Encryption')
         elif opt == 'hash-id':
-            encoded_data = codec.hash_id(data, 'encode')
+            encoded_data, tool = codec.hash_id(data, 'encode')
+            add_log_info(f'Using tool: {tool} for hash identification')
         
         return encoded_data
 
