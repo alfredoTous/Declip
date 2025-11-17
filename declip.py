@@ -15,13 +15,6 @@ import ui_rofi
 import ui_notification
 import codec
 
-"""
-   TO-DO 
-    4. Verify behavior on different cases 
-    6. README.md 
-    7. Improve xor
-    8. Add logs and -o for output log, default ./declip.log
-"""
 
 # Ctrl+C
 def def_handler(sig, frame):
@@ -50,7 +43,7 @@ def decode_data(data, opt):
         elif opt == 'hash-id':
             decoded_data = codec.hash_id(data, 'decode')
 
-        return decoded_data # type: ignore 
+        return decoded_data
 
     except Exception as e:
         exit_with_error(f'Error at decoding: {e}')
@@ -79,7 +72,7 @@ def encode_data(data, opt):
         elif opt == 'hash-id':
             encoded_data = codec.hash_id(data, 'encode')
         
-        return encoded_data #type: ignore
+        return encoded_data
 
     except Exception as e:
         exit_with_error(f'Error at encoding: {e}')
