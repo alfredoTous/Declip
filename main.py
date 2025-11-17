@@ -5,6 +5,8 @@ import sys
 import os
 import signal
 import argparse
+import logging
+import logging.handlers
 import base64
 import shutil
 from urllib.parse import unquote, quote
@@ -101,7 +103,9 @@ def parse_args():
         help="Silence notifications, 'error' to hide errors, 'data' to hide decoded/encoded data, 'all' to hide both (default)"
     )
 
-    parser.add_argument("-v", action="store_true", help="Activate logs on script dir")
+    parser.add_argument("--log", action="store_true", help="Activate logs, defaults output to './declip.log'")
+
+    parser.add_argument("-o", "--output", default="./declip.log", help="Select output dir for logs")
 
     return parser.parse_args()
 
@@ -109,10 +113,59 @@ def parse_args():
 def check_rofi():
     return shutil.which('rofi')
 
+# Get real script location for when executing via sxhkd
+def get_script_dir():
+    try:
+        actual_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(actual_dir, args.output)
+        # Test write permissions
+        with open(path, 'a'):
+            pass
+        return path
+    except Exception:
+        # If no permissions, fallback to user dir
+        return os.path.expanduser("~/")
+
+
+# Setup logs only if --log passed as argument
+def setup_logs():    
+    # Ensure log directory exists
+    os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+    
+    # Call get_script_dir if -o is referencing actual dir
+    if str(args.output).startswith('./'):
+        args.output = get_script_dir()
+
+    # Handler for filename and rotating log files when size is > 5MB
+    handler = logging.handlers.RotatingFileHandler(
+        filename=args.output, 
+        maxBytes=5 * 1024 * 1024,
+        backupCount=3 
+    )
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[handler]
+    )
+
+    logger = logging.getLogger('declip')
+    logger.info("=== Declip Started ===")
+    return logger
+
+
+def add_log_info(msg):
+    if not args.log:
+        return
+    logger.info(msg)
 
 def exit_with_error(msg):
     if args.quiet not in ('error', 'all'):
         ui_notification.print_error(msg)
+    if args.log:
+        logger.error(msg)
+        logger.error('=== Bad Exit... ===')
     sys.exit(1)
 
 
@@ -123,14 +176,19 @@ def main():
     global args
     args = parse_args()
 
-    # Get data from clipboard
-    data = pyperclip.paste()
+    if args.log:
+        global logger
+        logger = setup_logs()
 
+    # Get data from clipboard
+    data = pyperclip.paste().strip()
+    add_log_info(f'Copied from clipboard: {data}')
+    
     if not check_rofi():
         exit_with_error('Rofi was not found')
 
     # Validate clipboard and arguments 
-    if not data or len(data) == 0:
+    if not data or not len(data) > 1:
         exit_with_error('clipboard empty')
 
     if not args.decode and not args.encode:
@@ -139,34 +197,45 @@ def main():
     if args.decode and args.encode:
         exit_with_error('Invalid Arguments: use only one mode --decode OR --encode')
 
+    if not args.log and args.output != './declip.log':
+        exit_with_error('Invalid Arguments: Can\'t use -o without passing argument --log')
+
     result_data = None
     mode = None
 
     # Decode
     if args.decode:
+        add_log_info('Running mode: Decode')
         opt = ui_rofi.menu_select('Decode')
-        if opt == None:
+        add_log_info(f'Selected decode option: {opt}')
+        if opt is None:
             exit_with_error('Option not valid')
         result_data = decode_data(data, opt)
+        add_log_info(f'Decoded data: {result_data}')
         mode = 'Decode'
 
     # Encode
     if args.encode:
+        add_log_info('Executing Declip on mode Encode...')
         opt = ui_rofi.menu_select('Encode')
-        if opt == None:
+        add_log_info(f'Selected encode option: {opt}')
+        if opt is None:
             exit_with_error('Option not valid')
         result_data = encode_data(data, opt)
+        add_log_info(f'Encoded data: {result_data}')
         mode = 'Encode'
 
-    if result_data == None:
+    if result_data is None:
         exit_with_error('Unexpected Error')
 
     if not args.no_clip:
         pyperclip.copy(str(result_data)) 
+        add_log_info(f'Copied result to clipboard')
     
     if args.quiet not in ('data', 'all'):
         ui_notification.show_data(result_data, mode)
-   
+    
+    add_log_info("=== Declip Finished Successfully ===")
     return result_data
 
 
