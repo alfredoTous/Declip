@@ -6,9 +6,7 @@ Utility tool for **encoding and decoding data rapidly from the clipboard**, desi
 
 ## Demo
 
-...
-
----
+https://github.com/user-attachments/assets/24bf7388-1a57-4f4c-99a3-a2f1303e1f1d
 
 ## 🧠 Overview
 
